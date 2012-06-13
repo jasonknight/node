@@ -676,18 +676,16 @@ static Handle<Value> Exists(const Arguments& args) {
   HandleScope scope;
   
   int len = args.Length();
-  if (len < 1) return TYPE_ERROR("path required dude");
+  if (len < 1) return TYPE_ERROR("path required");
   if (!args[0]->IsString()) return TYPE_ERROR("path must be a string");
   
-  String::AsciiValue path(args[0]);
-  char * str = (char *) malloc(path.length() + 1);
-  strcpy(str, *path);
-  if (FILE * file = fopen(str, "r"))
-  {
-    fclose(file);
-    return scope.Close(True());
+  String::Utf8Value path(args[0]);
+  struct stat fstat;
+  int ret = stat(*path,&fstat);
+  if (ret < 0) {
+    return scope.Close(False());
   }
-  return scope.Close(False());
+  return scope.Close(True());
 }
 
 // bytesWritten = write(fd, data, position, enc, callback)
