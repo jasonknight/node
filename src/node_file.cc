@@ -680,12 +680,12 @@ static Handle<Value> Exists(const Arguments& args) {
   if (!args[0]->IsString()) return TYPE_ERROR("path must be a string");
   
   String::Utf8Value path(args[0]);
-  struct stat fstat;
-  int ret = stat(*path,&fstat);
-  if (ret < 0) {
-    return scope.Close(False());
+  FILE * f = fopen(*path,"r");
+  if (f) {
+    fclose(f);
+    return scope.Close(True());
   }
-  return scope.Close(True());
+  return scope.Close(False());
 }
 
 // bytesWritten = write(fd, data, position, enc, callback)
